@@ -174,6 +174,12 @@ class ProductController extends Controller
         //
     }
 
+    public function softDelete(Request $request, $id)
+    {
+        
+    }
+    
+
     public function update(Request $request, $id)
     {
         Log::info('updateProduct pozvana', ['id' => $id]);

@@ -42,8 +42,12 @@
                             <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal{{ $p->id }}">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Jeste li sigurni?')">
-                                <i class="bi bi-trash-fill"></i>
+                            <form action="{{ route('product.softDelete', $p->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                    <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Jeste li sigurni?')">
+                                    <i class="bi bi-trash-fill"></i>
+                            </form>
                             </button>
                         </td>
                     </tr>

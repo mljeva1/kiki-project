@@ -32,4 +32,5 @@ Route::post('/dashboard/create-product', [ProductController::class, 'create'])->
 Route::get('/dashboard/edit-product', [ProductController::class, 'editForm'])->name('product.editForm');
 Route::get('/dashboard/edit-product/{id}', [ProductController::class, 'editForm'])->name('product.editForm');
 Route::put('/dashboard/edit-product/{id}', [ProductController::class, 'update'])->name('product.update');
+# Route::put('/dashboard/edit-product/{id}', [ProductController::class, 'softDelete'])->name('product.softDelete');
 Route::post('/dashboard/products/{id}/images', [ProductController::class, 'updateImages'])->name('product.updateImages');
