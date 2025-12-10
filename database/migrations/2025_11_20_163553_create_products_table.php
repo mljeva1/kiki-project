@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('price', total: 8, places: 2);
             $table->decimal('old_price', total: 8, places: 2);
             $table->boolean('is_deleted')->default(false);
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->integer('quantity');
             $table->integer('article_number');
             $table->timestamps();

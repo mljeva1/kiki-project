@@ -42,13 +42,20 @@
                             <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal{{ $p->id }}">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
-                            <form action="{{ route('product.softDelete', $p->id) }}" method="POST">
+                            <form action="{{ route('product.toggleStatus', $p->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('PUT')
-                                    <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Jeste li sigurni?')">
-                                    <i class="bi bi-trash-fill"></i>
+                                <button type="submit" class="btn btn-sm {{ $p->is_active == 0 ? 'btn-outline-success' : 'btn-outline-warning' }}">
+                                    {!! $p->is_active == 0 ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>' !!}
+                                </button>
                             </form>
-                            </button>
+                            <form action="{{ route('product.destroy', $p->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Jeste li sigurni?')">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
@@ -57,9 +64,7 @@
     </div>
 </div>
 
-<!-- ============================================ -->
 <!-- MODAL ZA UREĐIVANJE PROIZVODA -->
-<!-- ============================================ -->
 @foreach ($products as $p)
 <div class="modal fade" id="editProductModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -85,6 +90,10 @@
                         <input type="number" name="price" step="0.01" min="0.01" class="form-control" value="{{ $p->price }}" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Stara cijena</label>
+                        <input type="number" name="old_price" step="0.01" min="0" class="form-control" value="{{ $p->old_price }}">
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Količina</label>
                         <input type="number" name="quantity" class="form-control" value="{{ $p->quantity }}" required>
                     </div>
@@ -98,9 +107,7 @@
     </div>
 </div>
 
-<!-- ============================================ -->
 <!-- MODAL ZA UREĐIVANJE SLIKA -->
-<!-- ============================================ -->
 <div class="modal fade" id="imagesModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -108,20 +115,19 @@
                 <h5 class="modal-title">Uredi slike - {{ $p->name }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('product.updateImages', $p->id) }}" method="POST" id="imagesForm{{ $p->id }}">
+            <form action="{{ route('product.updateImages', $p->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <!-- Drag & Drop kontejner za slike -->
                     <div id="imagesSortable{{ $p->id }}" class="images-sortable" style="background: #f8f9fa; padding: 20px; border-radius: 5px; min-height: 200px; border: 2px dashed #ccc;">
                         @forelse ($p->images->sortBy('sort_order') as $image)
-                            <div class="image-item" data-image-id="{{ $image->id }}" data-sort-order="{{ $image->sort_order }}" 
-                                 style="display: inline-block; margin: 10px; padding: 10px; background: white; border-radius: 5px; cursor: grab; text-align: center; position: relative;">
+                            <div class="image-item" data-image-id="{{ $image->id }}" style="display: inline-block; margin: 10px; padding: 10px; background: white; border-radius: 5px; cursor: grab; text-align: center; position: relative;">
                                 <img src="{{ asset($image->location) }}" style="max-width: 100px; max-height: 100px; border-radius: 3px; display: block; margin-bottom: 8px;">
-                                <small style="display: block; margin-bottom: 8px;">Red: <strong>{{ $image->sort_order }}</strong></small>
+                                <small style="display: block; margin-bottom: 8px;">Red: <span class="sort-order-display">{{ $image->sort_order }}</span></small>
                                 <button type="button" class="btn btn-sm btn-danger delete-image" data-image-id="{{ $image->id }}">
                                     <i class="bi bi-trash"></i> Obriši
                                 </button>
                                 <input type="hidden" name="images[{{ $image->id }}][sort_order]" class="sort-order-input" value="{{ $image->sort_order }}">
+                                <input type="hidden" name="images[{{ $image->id }}][action]" class="action-input" value="update">
                             </div>
                         @empty
                             <p class="text-muted text-center">Nema slika</p>

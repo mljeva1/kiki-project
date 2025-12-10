@@ -17,7 +17,10 @@ class ProductController extends Controller
     }
     public function editForm()
     {
-        $products = Product::with('images')->orderBy('article_number','asc')->get();
+        $products = Product::with('images')
+            ->where('is_deleted', false)
+            ->orderBy('article_number','asc')
+            ->get();
         return view('product.edit', ['products' => $products]);
     }
     public function create(Request $request)
@@ -176,7 +179,7 @@ class ProductController extends Controller
 
     public function softDelete(Request $request, $id)
     {
-        
+
     }
     
 
@@ -238,8 +241,31 @@ class ProductController extends Controller
     
     }
 
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        Log::info('ProductController: softDelete pozvana', ['id' => $id]);
+
+        $product = Product::findOrFail($id);
+        $product->is_deleted = true;
+        $product->is_active = false;
+        $product->save();
+
+        Log::info('ProductController: Proizvod soft-obrisan', ['id' => $product->id]);
+
+        return back()->with('success', 'Proizvod uspješno obrisan!');
     }
+
+    public function toggleStatus($id)
+    {
+        Log::info('ProductController: toggleStatus pozvana', ['id' => $id]);
+
+        $product = Product::findOrFail($id);
+        $product->is_active = !$product->is_active;
+        $product->save();
+
+        Log::info('ProductController: Status promijenjen', ['id' => $product->id, 'is_active' => $product->is_active]);
+
+        return back()->with('success', 'Status uspješno promijenjen!');
+    }
+
 }
